@@ -1,0 +1,31 @@
+@using ScholarshipHive.Server.Dtos
+@model DepartmentMonthlyHoursDto
+@{
+    ViewData["Title"] = "Department Employee Hours";
+    var monthKey = $"{Model.Year:D4}-{Model.Month:D2}";
+}
+<div class="page-header">
+    <div><h2>Employee Monthly Attendance</h2><p>@Model.Department · Select an employee to see daily records</p></div>
+    <a class="btn btn-outline-secondary" href="/TeamScope">Back to department</a>
+</div>
+<div class="sh-card p-3 mb-3">
+    <form method="get" action="/TeamScope/Hours" class="d-flex flex-wrap align-items-end gap-2">
+        <div><label class="form-label" for="month">Month</label><input id="month" type="month" name="month" value="@monthKey" max="@ViewBag.CurrentMonth" class="form-control" /></div>
+        <button class="btn btn-primary" type="submit">View month</button>
+        <a class="btn btn-outline-secondary" href="/TeamScope/Hours?month=@ViewBag.PreviousMonth">Previous month</a>
+        @if (monthKey != (string)ViewBag.CurrentMonth) { <a class="btn btn-outline-secondary" href="/TeamScope/Hours?month=@ViewBag.NextMonth">Next month</a> }
+    </form>
+</div>
+<div class="sh-card p-3">
+    <h5 class="mb-3">Choose employee · @(new DateTime(Model.Year,Model.Month,1).ToString("MMMM yyyy"))</h5>
+    <div class="list-group">
+        @foreach (var employee in Model.Employees.OrderBy(e => e.Name))
+        {
+            <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center flex-wrap gap-2" href="/TeamScope/Hours/@employee.UserId?month=@monthKey">
+                <span><strong>@employee.Name</strong><small class="text-muted d-block">@employee.Department</small></span>
+                <span class="text-primary">View monthly history →</span>
+            </a>
+        }
+        @if (Model.Employees.Count == 0) { <p class="text-muted m-2">No active employees assigned to this department.</p> }
+    </div>
+</div>
